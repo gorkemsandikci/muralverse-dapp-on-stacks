@@ -1,131 +1,293 @@
-# STX/sBTC Fundraising App
+# Urban Canvas: Community Street Art Revival
 
-![Fundraising on Stacks](./screenshot.png)
+<div align="center">
+  <img src="./screenshotv1.png" alt="Street Art Mural Project" width="600" style="max-width: 60%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+</div>
 
-This is a simple crypto fundraising web page built on Stacks. It lets people run a campaign to raise funds in STX and sBTC.
+A vibrant, community-driven fundraising platform built on Stacks blockchain for the **Urban Canvas: Community Street Art Revival** campaign. This project transforms the Hiro Platform fundraising template into an immersive street art experience that celebrates community creativity and urban transformation.
 
-This example app is intended for educational purposes only. The provided smart contracts have not been audited.
+## 🎨 Project Overview
 
-## Development
+**Urban Canvas: Community Street Art Revival** is a transformative initiative that brings vibrant street art murals to downtown spaces, revitalizing urban environments and fostering community pride. This project goes beyond simple beautification – it's about creating meaningful connections between artists, residents, and the spaces they share.
 
-To run this app with a Stacks Devnet (private development blockchain environment), follow these steps:
+### 🌟 Campaign Details
+- **Funding Goal**: $15,000 USD
+- **Duration**: 90 days
+- **Beneficiary**: Downtown Arts Collective
+- **Campaign Type**: Street Art Mural Project
+- **Theme**: Urban Revitalization through Community Art
 
-1. **Start Devnet in Hiro Platform**
+### 🎯 Key Features
+- **Artist Voting System**: Community-driven mural design selection
+- **Funding Breakdown**: Transparent allocation of funds
+- **Project Timeline**: 12-week roadmap with specific milestones
+- **Community Engagement**: Interactive elements for neighborhood participation
+- **Street Art Aesthetic**: Vibrant colors, graffiti typography, urban textures
 
-   - Log into the [Hiro Platform](https://platform.hiro.so)
-   - Navigate to your project and start Devnet (do not opt to update the Devnet deployment plan, as it's pre-configured with some contract calls to initialize the project)
-   - Copy your API key from either:
-     - The Devnet Stacks API URL: `https://api.platform.hiro.so/v1/ext/<YOUR-API-KEY>/stacks-blockchain-api`
-     - Or from https://platform.hiro.so/settings/api-keys
+## 🚀 Getting Started
 
-2. **Configure Local Environment**
+### Prerequisites
+- Node.js 18+ and npm
+- Hiro Platform account
+- Stacks blockchain knowledge (basic)
 
-Install dependencies:
+### Development Setup
+
+1. **Clone the Repository**
 ```bash
+git clone https://github.com/gorkemsandikci/muralverse-dapp-on-stacks
+cd fundraising-dapp-on-stacks
+```
+
+2. **Install Dependencies**
+```bash
+npm install
+cd front-end
 npm install
 ```
 
-
-Create an `.env` file using the existing `.env.example` file:
+3. **Environment Configuration**
 ```bash
 cp front-end/.env.example front-end/.env
 ```
 
-
-Add your Hiro Platform API key to the renamed `front-end/.env` file:
+Add your Hiro Platform API key to `front-end/.env`:
 ```bash
 NEXT_PUBLIC_PLATFORM_HIRO_API_KEY=your-api-key-here
 ```
 
-3. **Start the Frontend Application**
-
-Start the Next.js application from the front-end directory.
+4. **Start Development Server**
 ```bash
-cd front-end
 npm run dev
 ```
 
+Visit `http://localhost:3000` to view your street art fundraising platform.
 
-Visit `[http://localhost:3000](http://localhost:3000)` in your browser to view and interact with the marketplace. If Devnet is running, your test wallets will already be funded and connected for testing.
+## 🎨 Customization Guide
 
-## Customization
+### Campaign Configuration
 
-To customize this app for your fundraiser, edit the files `front-end/src/constants/campaign.ts` and `front-end/public/campaign-details.md`. Add images for the carousel to the `front-end/public/campaign` folder.
+Edit `front-end/src/constants/campaign.ts` to customize:
+- Campaign title and description
+- Funding goal and duration
+- Theme colors and styling
+- Campaign milestones and features
 
-The given Devnet deployment plan (found in `clarity/deployments/default.devnet-plan.yaml`) includes steps to initialize the campaign with a given funding goal. You can customize this plan as desired.
+### Campaign Content
 
-When you're ready to deploy in Testnet or Mainnet, you can choose to add similar steps to your testnet/mainnet deployment plans, or you can initialize your campaign manually by calling the `fundraising.initialize-campaign` function on-chain.
+Update `front-end/public/campaign-details.md` with:
+- Project overview and mission
+- Funding breakdown details
+- Timeline and milestones
+- Team information
+- Community impact statements
 
-## About the Smart Contracts
+### Visual Assets
 
-This app uses a Clarity smart contract which handles the collection of funds.
+Add campaign images to `front-end/public/campaign/`:
+- Artist portfolio images
+- Mural design concepts
+- Community photos
+- Urban texture backgrounds
+
+### Theme Customization
+
+Modify `front-end/src/theme.ts` for:
+- Street art color palette
+- Custom fonts (Permanent Marker, Creepster)
+- Button variants and hover effects
+- Progress bar styling
+
+## 🏗️ Smart Contract Architecture
 
 ### `fundraising.clar`
+The core Clarity smart contract that handles:
+- Campaign initialization with USD funding goals
+- STX and sBTC donation acceptance
+- Individual contribution tracking
+- Fund withdrawal for beneficiaries
+- Campaign cancellation and refunds
 
-- Allows the contract owner to initialize the campaign with a fundraising goal in USD
-- Accepts donations in STX or sBTC
-- Tracks individual contributions
-- Lets the beneficiary (contract owner) withdraw the raised funds if the goal is hit
-- Allows the beneficiary to cancel the campaign and refund the contributions to the donors at any point
+### Key Functions
+- `initialize-campaign`: Set up fundraising parameters
+- `contribute-stx`: Accept STX donations
+- `contribute-sbtc`: Accept sBTC donations
+- `withdraw-funds`: Beneficiary fund withdrawal
+- `cancel-campaign`: Cancel and refund donations
 
-## Testing with Devnet
+## 🧪 Testing with Devnet
 
-The Hiro Platform's Devnet is a sandboxed, personal blockchain environment for testing your dApps before deploying them to the testnet or mainnet. Each time you start a new Devnet, it will reset the blockchain state and deploy your project contracts from scratch.
+### 1. Start Hiro Platform Devnet
+1. Log into [Hiro Platform](https://platform.hiro.so)
+2. Navigate to your project and start Devnet
+3. Copy your API key from the Devnet Stacks API URL
 
-This is useful because deployments to the blockchain are permanent and cannot be undone. Ensure you have tested your contracts thoroughly in your Devnet before promoting them to Testnet or Mainnet.
+### 2. Test Smart Contract Functions
+1. Select the Devnet tab in Platform dashboard
+2. Click "Interact with Devnet" → "Call functions"
+3. Test campaign initialization, donations, and withdrawals
+4. Use pre-funded devnet wallets for testing
 
-If you make changes to your contract, you will need to push your changes and restart Devnet for the contract changes to appear in your Devnet.
+### 3. Frontend Integration Testing
+1. Ensure Devnet is running
+2. Start frontend with `npm run dev`
+3. Test donation flow, voting system, and UI interactions
+4. Verify blockchain transactions in Devnet dashboard
 
-### 1. Start Devnet and Deploy Contracts
+## 🌈 Street Art Theme Features
 
-1. Open your project in the Hiro Platform
-2. Click "Start Devnet" to initialize your testing environment (the contracts will be automatically deployed per your deployment plan)
-3. You should see your contracts deployed no later than block 45 in the Devnet dashboard
+### Visual Design
+- **Color Palette**: Electric Blue (#00D4FF), Vibrant Orange (#FF6B35), Neon Green (#39FF14), Deep Purple (#6A0DAD)
+- **Typography**: Graffiti-style fonts (Permanent Marker, Creepster)
+- **Animations**: Paint drip effects, spray paint animations, neon glow
+- **Layout**: Urban textures, paint splatter backgrounds, polaroid-style cards
 
-### 2. Testing Smart Contract Functions
+### Interactive Elements
+- **Progress Tracker**: Paint can filling animation with street art colors
+- **Funding Breakdown**: Interactive cards with hover effects
+- **Campaign Timeline**: Visual milestone tracking
+- **Artist Voting**: Community-driven selection interface
 
-Smart contract functions can be tested directly from your Platform dashboard.
+### Community Engagement
+- **Voting System**: Real-time artist and design selection
+- **Progress Updates**: Visual feedback on campaign milestones
+- **Social Sharing**: Community photo and story integration
+- **Neighborhood Input**: Location-based feedback collection
 
-1. Select the Devnet tab to confirm that your contracts are deployed and Devnet is running
-2. Click "Interact with Devnet" and then "Call functions"
-3. Select your contract and the function you want to test from the dropdown menus
-4. Use one of the pre-funded devnet wallets as the caller and another as the recipient (if needed)
-5. Click "Call function" to execute the function, which will either succeed or fail based on the function's logic and the caller's permissions
-6. Once the function has been submitted, you can watch for the transaction to resolve on-chain in the Devnet dashboard and confirm that the function executed as expected
+## 📱 User Experience
 
-Remember that any changes to the contracts will require restarting Devnet and redeploying the contracts.
+### Mobile Responsiveness
+- Thumb-friendly voting buttons
+- Responsive grid layouts
+- Adaptive typography scaling
+- Touch-optimized interactions
 
-### 3. Integration Testing
+### Accessibility
+- High contrast ratios despite vibrant colors
+- Screen reader friendly content
+- Keyboard navigation support
+- Reduced motion options
 
-With Devnet running, you can test your front-end functionality and validate that it's working in the same way you just tested the fundraising functions.
+### Performance
+- Optimized image loading
+- Efficient animations
+- Fast page transitions
+- Progressive enhancement
 
-1. Confirm that your Devnet is running in the Platform dashboard and `npm run dev` is running in the front-end directory
-2. Navigate to [http://localhost:3000](http://localhost:3000) to view and interact with the fundraising app
-3. View your campaign and test the contribution, refunding, and withdrawal functionality using the pre-funded wallets. Use the wallet picker in the upper right corner to choose between different test wallets.
-4. Navigate to the Devnet dashboard in the Platform to view the transactions as they are submitted and resolved on-chain.
+## 🚀 Deployment
 
-You do not need to restart Devnet to test changes to your front-end.
+### Testnet Deployment
+1. Get test STX from [Stacks Testnet Faucet](https://explorer.hiro.so/sandbox/faucet?chain=testnet)
+2. Update environment variables for testnet
+3. Deploy contracts through Hiro Platform
+4. Test with real network conditions
 
-## Next Steps
+### Mainnet Launch
+1. Ensure sufficient STX for deployment costs
+2. Update deployment configuration for mainnet
+3. Deploy contracts through Platform dashboard
+4. Update frontend environment variables
+5. Launch and begin processing real transactions
 
-Once you've thoroughly tested your dApp in Devnet and are confident in its functionality, you can proceed to testing on the Stacks Testnet before launching on Mainnet.
+## 🔧 Technical Stack
 
-### Moving to Testnet
+### Frontend
+- **Framework**: Next.js 15.1.7
+- **UI Library**: Chakra UI with custom theme
+- **Styling**: CSS-in-JS with street art animations
+- **State Management**: React hooks and context
 
-1. Use the [Stacks Testnet Faucet](https://explorer.hiro.so/sandbox/faucet?chain=testnet) to get test STX tokens
-3. Update the environment variables in your `.env` file to add values for `NEXT_PUBLIC_CONTRACT_DEPLOYER_TESTNET_ADDRESS` and `NEXT_PUBLIC_CONTRACT_DEPLOYER_MAINNET_ADDRESS`. Add the STX wallet address you plan to deploy the contract with.
-4. Deploy your contracts to the Testnet using the Platform dashboard and your deployment plan
-5. Test your application with real network conditions and transaction times
-6. Verify your contract interactions in the [Testnet Explorer](https://explorer.hiro.so/?chain=testnet)
+### Blockchain
+- **Network**: Stacks blockchain
+- **Smart Contracts**: Clarity language
+- **Wallet Integration**: Hiro Wallet, Devnet wallets
+- **API**: Stacks blockchain API
 
-### Launching on Mainnet
+### Development
+- **Language**: TypeScript
+- **Build Tool**: Next.js build system
+- **Package Manager**: npm
+- **Code Quality**: ESLint, TypeScript compiler
 
-When you're ready to launch your app:
+## 🤝 Contributing
 
-1. Ensure you have real STX tokens for deployment and transaction costs
-2. Update your deployment configuration to target Mainnet
-3. Deploy your contracts through the Platform dashboard
-4. Update your frontend environment variables to point to Mainnet
-5. Launch your application and begin processing real transactions!
+### Development Workflow
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly in Devnet
+5. Submit a pull request
 
-Remember: Mainnet deployments are permanent and involve real cryptocurrency transactions. Double-check all contract code and frontend integrations before deploying to Mainnet.
+### Code Standards
+- Follow TypeScript best practices
+- Maintain street art aesthetic consistency
+- Ensure mobile responsiveness
+- Include accessibility features
+
+## 📋 Project Roadmap
+
+### Phase 1: Foundation ✅
+- [x] Campaign setup and configuration
+- [x] Basic fundraising functionality
+- [x] Street art theme integration
+- [x] Community voting system
+
+### Phase 2: Enhancement 🚧
+- [ ] Advanced animations and effects
+- [ ] Social media integration
+- [ ] Community photo sharing
+- [ ] Artist portfolio galleries
+
+### Phase 3: Expansion 📅
+- [ ] Multi-campaign support
+- [ ] Advanced analytics
+- [ ] Mobile app development
+- [ ] International localization
+
+## 🆘 Support & Resources
+
+### Documentation
+- [Hiro Platform Documentation](https://docs.hiro.so/)
+- [Stacks Documentation](https://docs.stacks.co/)
+- [Clarity Language Reference](https://docs.stacks.co/write-smart-contracts/overview)
+
+### Community
+- [Stacks Discord](https://discord.gg/stacks)
+- [Hiro Community](https://community.hiro.so/)
+- [GitHub Issues](https://github.com/hirosystems/platform-template-fundraising-dapp/issues)
+
+### Tools
+- [Stacks Explorer](https://explorer.hiro.so/)
+- [Clarity Tools](https://clarity.tools/)
+- [Stacks Wallet](https://www.hiro.so/wallet)
+
+## ⚠️ Important Notes
+
+### Security
+- Smart contracts are for educational purposes
+- Not audited for production use
+- Test thoroughly before mainnet deployment
+- Follow security best practices
+
+### Legal
+- Ensure compliance with local regulations
+- Verify fundraising requirements
+- Consult legal professionals if needed
+- Understand tax implications
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Hiro Systems** for the fundraising template
+- **Stacks Foundation** for blockchain infrastructure
+- **Downtown Arts Collective** for project inspiration
+- **Community artists** for creative vision
+
+---
+
+**Urban Canvas: Community Street Art Revival** - Transforming spaces, building community, one mural at a time. 🎨✨
+
+*Built with ❤️ on Stacks blockchain*

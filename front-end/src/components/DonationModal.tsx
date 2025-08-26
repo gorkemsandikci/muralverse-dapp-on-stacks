@@ -98,206 +98,445 @@ export default function DonationModal({
     if (!amount || amount <= 0) {
       toast({
         title: "Invalid amount",
-        description: "Please enter a valid donation amount",
+        description: "Please enter a valid amount greater than 0",
         status: "error",
-        duration: 3000,
+        duration: 5000,
         isClosable: true,
       });
+      setIsLoading(false);
       return;
     }
 
-    // Handle donation
     try {
-      const txOptions =
-        paymentMethod === "sbtc"
-          ? getContributeSbtcTx(getStacksNetworkString(), {
-              address: currentWalletAddress || "",
-              amount: Math.round(
-                btcToSats(usdToSbtc(amount, prices?.sbtc || 0))
-              ),
-            })
-          : getContributeStxTx(getStacksNetworkString(), {
-              address: currentWalletAddress || "",
-              amount: Math.round(
-                Number(stxToUstx(usdToStx(amount, prices?.stx || 0)))
-              ),
-            });
+      if (paymentMethod === "stx") {
+        const stxAmount = usdToStx(amount, prices?.stx || 0);
+        const ustxAmount = stxToUstx(stxAmount);
 
-      const doSuccessToast = (txid: string) => {
-        toast({
-          title: "Thank you!",
-          description: (
-            <Flex direction="column" gap="4">
-              <Box>Processing donation of ${amount}.</Box>
-              <Box fontSize="xs">
-                Transaction ID: <strong>{txid}</strong>
-              </Box>
-            </Flex>
-          ),
-          status: "success",
-          isClosable: true,
-          duration: 30000,
-        });
-      };
-
-      // Devnet uses direct call, Testnet/Mainnet needs to prompt with browser extension
-      if (isDevnetEnvironment()) {
-        const { txid } = await executeContractCall(txOptions, devnetWallet);
-        doSuccessToast(txid);
+        if (isDevnetEnvironment()) {
+          const txOptions = getContributeStxTx(
+            getStacksNetworkString(),
+            { address: currentWalletAddress || "", amount: Number(ustxAmount) }
+          );
+          await executeContractCall(
+            txOptions,
+            devnetWallet
+          );
+        } else {
+          const txOptions = getContributeStxTx(
+            getStacksNetworkString(),
+            { address: currentWalletAddress || "", amount: Number(ustxAmount) }
+          );
+          await openContractCall(txOptions);
+        }
       } else {
-        await openContractCall({
-          ...txOptions,
-          onFinish: (data) => {
-            doSuccessToast(data.txId);
-          },
-          onCancel: () => {
-            toast({
-              title: "Cancelled",
-              description: "Transaction was cancelled",
-              status: "info",
-              duration: 3000,
-            });
-          },
-        });
+        const sbtcAmount = usdToSbtc(amount, prices?.sbtc || 0);
+        const satsAmount = btcToSats(sbtcAmount);
+
+                  if (isDevnetEnvironment()) {
+            const txOptions = getContributeSbtcTx(
+              getStacksNetworkString(),
+              { address: currentWalletAddress || "", amount: satsAmount }
+            );
+            await executeContractCall(
+              txOptions,
+              devnetWallet
+            );
+          } else {
+          const txOptions = getContributeSbtcTx(
+            getStacksNetworkString(),
+            { address: currentWalletAddress || "", amount: satsAmount }
+          );
+          await openContractCall(txOptions);
+        }
       }
-      setCustomAmount("");
-      setSelectedAmount(null);
-    } catch (e) {
-      console.error(e);
+
       toast({
-        title: "Error",
-        description: "Failed to make contribution",
+        title: "Contribution submitted",
+        description: "Your contribution has been submitted to the blockchain",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+
+      onClose();
+    } catch (error) {
+      console.error("Contribution error:", error);
+      toast({
+        title: "Contribution failed",
+        description: "There was an error processing your contribution",
         status: "error",
+        duration: 5000,
+        isClosable: true,
       });
     } finally {
       setIsLoading(false);
-      onClose();
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="full">
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Make a Contribution</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody pb="8">
-          <Flex direction="column" gap="3">
+    <Modal isOpen={isOpen} onClose={onClose} size="xl">
+      <ModalOverlay 
+        bg="rgba(0, 0, 0, 0.8)"
+        backdropFilter="blur(20px)"
+      />
+      <ModalContent 
+        bg="rgba(26, 32, 44, 0.85)"
+        border="2px solid"
+        borderColor="rgba(0, 212, 255, 0.3)"
+        borderRadius="2xl"
+        backdropFilter="blur(25px)"
+        boxShadow="0 25px 50px rgba(0, 0, 0, 0.5), 0 0 100px rgba(0, 212, 255, 0.2)"
+        position="relative"
+        overflow="hidden"
+        _before={{
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(255, 107, 53, 0.1) 50%, rgba(57, 255, 20, 0.1) 100%)",
+          borderRadius: "inherit",
+          zIndex: 0,
+        }}
+      >
+        {/* Decorative Elements */}
+        <Box
+          position="absolute"
+          top="-50px"
+          right="-50px"
+          w="100px"
+          h="100px"
+          bg="rgba(0, 212, 255, 0.2)"
+          borderRadius="full"
+          filter="blur(20px)"
+          zIndex={1}
+        />
+        <Box
+          position="absolute"
+          bottom="-30px"
+          left="-30px"
+          w="60px"
+          h="60px"
+          bg="rgba(255, 107, 53, 0.2)"
+          borderRadius="full"
+          filter="blur(15px)"
+          zIndex={1}
+        />
+        
+        <ModalHeader 
+          fontFamily="tech" 
+          color="white" 
+          textAlign="center" 
+          bg="rgba(26, 32, 44, 0.9)"
+          borderBottom="1px solid"
+          borderColor="rgba(0, 212, 255, 0.3)"
+          backdropFilter="blur(10px)"
+          position="relative"
+          zIndex={2}
+          py={6}
+        >
+          <VStack spacing={2}>
+            <Text fontSize="3xl" textShadow="0 0 20px rgba(0, 212, 255, 0.8)">
+              🎨
+            </Text>
+            <Text fontSize="2xl" fontWeight="bold">
+              Make a Contribution
+            </Text>
+            <Text fontSize="sm" color="rgba(255, 255, 255, 0.7)">
+              Support Muralverse: Urban Canvas Community Street Art Revival
+            </Text>
+          </VStack>
+        </ModalHeader>
+        
+        <ModalCloseButton 
+          color="white"
+          bg="rgba(0, 0, 0, 0.3)"
+          border="1px solid"
+          borderColor="rgba(255, 255, 255, 0.2)"
+          borderRadius="full"
+          w="40px"
+          h="40px"
+          _hover={{
+            bg: "rgba(0, 212, 255, 0.3)",
+            borderColor: "rgba(0, 212, 255, 0.8)",
+            transform: "scale(1.1)",
+          }}
+          transition="all 0.3s"
+          position="relative"
+          zIndex={3}
+        />
+        
+        <ModalBody pb="8" position="relative" zIndex={2}>
+          <Flex direction="column" gap={6}>
             {!currentWalletAddress ? (
-              <Flex
-                p={6}
-                borderWidth="1px"
-                borderRadius="lg"
-                align="center"
-                justify="center"
-                direction="column"
-                gap="4"
-              >
-                <Box>Please connect a STX wallet to make a contribution.</Box>
-                {isDevnetEnvironment() ? (
-                  <DevnetWalletButton
-                    currentWallet={devnetWallet}
-                    wallets={devnetWallets}
-                    onWalletSelect={setDevnetWallet}
-                  />
-                ) : (
-                  <ConnectWalletButton />
-                )}
-              </Flex>
+              <VStack spacing={6}>
+                <Box
+                  p={8}
+                  bg="rgba(255, 255, 255, 0.05)"
+                  borderRadius="xl"
+                  border="1px solid"
+                  borderColor="rgba(255, 255, 255, 0.1)"
+                  backdropFilter="blur(10px)"
+                  textAlign="center"
+                  w="full"
+                >
+                  <Text fontSize="lg" color="white" mb={4}>
+                    Connect your wallet to contribute to the Urban Canvas campaign
+                  </Text>
+                  <HStack spacing={4} justify="center">
+                    <ConnectWalletButton />
+                    <DevnetWalletButton
+                      wallets={devnetWallets}
+                      currentWallet={devnetWallet}
+                      onWalletSelect={setDevnetWallet}
+                    />
+                  </HStack>
+                </Box>
+              </VStack>
             ) : (
               <>
                 {hasMadePreviousDonation ? (
-                  <Alert mb="4">
+                  <Alert 
+                    bg="rgba(0, 212, 255, 0.1)"
+                    borderColor="rgba(0, 212, 255, 0.3)"
+                    border="1px solid"
+                    borderRadius="xl"
+                    backdropFilter="blur(10px)"
+                  >
                     <Box>
-                      <AlertTitle>
-                        Heads up: you&apos;ve contributed before. Thank you!
+                      <AlertTitle color="white" fontSize="lg">
+                        🎉 You have already contributed to this campaign!
                       </AlertTitle>
-                      <AlertDescription>
-                        <Box>
-                          STX:{" "}
-                          {Number(
-                            ustxToStx(previousDonation?.stxAmount)
-                          ).toFixed(2)}
-                        </Box>
-                        <Box>
-                          sBTC:{" "}
-                          {satsToSbtc(previousDonation?.sbtcAmount).toFixed(8)}
-                        </Box>
+                      <AlertDescription color="rgba(255, 255, 255, 0.8)" mt={2}>
+                        <VStack align="start" spacing={1}>
+                          <Text>
+                            <strong>STX:</strong>{" "}
+                            {Number(
+                              ustxToStx(previousDonation?.stxAmount)
+                            ).toFixed(2)}
+                          </Text>
+                          <Text>
+                            <strong>sBTC:</strong>{" "}
+                            {satsToSbtc(previousDonation?.sbtcAmount).toFixed(8)}
+                          </Text>
+                        </VStack>
                       </AlertDescription>
                     </Box>
                   </Alert>
                 ) : null}
-                <Box mx="auto" p={6} borderWidth="1px" borderRadius="lg">
-                  <VStack spacing={6} align="stretch">
-                    <Text fontSize="lg" fontWeight="bold">
-                      Choose Payment Method
-                    </Text>
+                
+                <Box 
+                  p={8}
+                  bg="rgba(255, 255, 255, 0.05)"
+                  borderRadius="xl"
+                  border="1px solid"
+                  borderColor="rgba(255, 255, 255, 0.1)"
+                  backdropFilter="blur(10px)"
+                  position="relative"
+                  overflow="hidden"
+                >
+                  {/* Inner decorative elements */}
+                  <Box
+                    position="absolute"
+                    top="10px"
+                    right="10px"
+                    w="20px"
+                    h="20px"
+                    bg="rgba(57, 255, 20, 0.3)"
+                    borderRadius="full"
+                    filter="blur(5px)"
+                  />
+                  <Box
+                    position="absolute"
+                    bottom="10px"
+                    left="10px"
+                    w="15px"
+                    h="15px"
+                    bg="rgba(255, 107, 53, 0.3)"
+                    borderRadius="full"
+                    filter="blur(3px)"
+                  />
+                  
+                  <VStack spacing={6} align="stretch" position="relative" zIndex={1}>
+                    <Box textAlign="center" mb={2}>
+                      <Text fontSize="xl" fontWeight="bold" color="white" mb={2}>
+                        💳 Choose Payment Method
+                      </Text>
+                      <Text fontSize="sm" color="rgba(255, 255, 255, 0.6)">
+                        Select your preferred cryptocurrency
+                      </Text>
+                    </Box>
 
                     <RadioGroup
                       value={paymentMethod}
                       onChange={setPaymentMethod}
                     >
-                      <div>
-                        <Radio value="stx" id="stx">
-                          STX
+                      <HStack spacing={6} justify="center">
+                        <Radio 
+                          value="stx" 
+                          id="stx" 
+                          colorScheme="blue"
+                          size="lg"
+                        >
+                          <Box
+                            p={3}
+                            bg={paymentMethod === "stx" ? "rgba(0, 212, 255, 0.2)" : "rgba(255, 255, 255, 0.05)"}
+                            borderRadius="lg"
+                            border="1px solid"
+                            borderColor={paymentMethod === "stx" ? "rgba(0, 212, 255, 0.5)" : "rgba(255, 255, 255, 0.1)"}
+                            transition="all 0.3s"
+                            _hover={{
+                              bg: "rgba(0, 212, 255, 0.1)",
+                              borderColor: "rgba(0, 212, 255, 0.3)",
+                            }}
+                          >
+                            <Text color="white" fontWeight="bold">STX</Text>
+                            <Text fontSize="xs" color="rgba(255, 255, 255, 0.6)">Stacks Token</Text>
+                          </Box>
                         </Radio>
-                      </div>
-                      <div>
-                        <Radio value="sbtc" id="sbtc">
-                          sBTC
+                        <Radio 
+                          value="sbtc" 
+                          id="sbtc" 
+                          colorScheme="blue"
+                          size="lg"
+                        >
+                          <Box
+                            p={3}
+                            bg={paymentMethod === "sbtc" ? "rgba(0, 212, 255, 0.2)" : "rgba(255, 255, 255, 0.05)"}
+                            borderRadius="lg"
+                            border="1px solid"
+                            borderColor={paymentMethod === "sbtc" ? "rgba(0, 212, 255, 0.5)" : "rgba(255, 255, 255, 0.1)"}
+                            transition="all 0.3s"
+                            _hover={{
+                              bg: "rgba(0, 212, 255, 0.1)",
+                              borderColor: "rgba(0, 212, 255, 0.3)",
+                            }}
+                          >
+                            <Text color="white" fontWeight="bold">sBTC</Text>
+                            <Text fontSize="xs" color="rgba(255, 255, 255, 0.6)">Bitcoin on Stacks</Text>
+                          </Box>
                         </Radio>
-                      </div>
+                      </HStack>
                     </RadioGroup>
 
-                    <Text fontSize="lg" fontWeight="bold">
-                      Choose Contribution Amount
-                    </Text>
+                    <Box textAlign="center" mt={4}>
+                      <Text fontSize="xl" fontWeight="bold" color="white" mb={2}>
+                        💰 Choose Contribution Amount
+                      </Text>
+                      <Text fontSize="sm" color="rgba(255, 255, 255, 0.6)">
+                        Select a preset amount or enter custom value
+                      </Text>
+                    </Box>
 
-                    <HStack spacing={4} justify="center" wrap="wrap">
+                    <HStack spacing={3} justify="center" wrap="wrap">
                       {presetAmounts.map((amount) => (
                         <Button
                           key={amount}
                           size="lg"
-                          variant={
-                            selectedAmount === amount ? "solid" : "outline"
-                          }
-                          colorScheme="blue"
+                          variant="ghost"
                           onClick={() => handlePresetClick(amount)}
+                          bg={selectedAmount === amount ? "rgba(0, 212, 255, 0.3)" : "rgba(255, 255, 255, 0.05)"}
+                          color={selectedAmount === amount ? "white" : "rgba(255, 255, 255, 0.8)"}
+                          border="1px solid"
+                          borderColor={selectedAmount === amount ? "rgba(0, 212, 255, 0.8)" : "rgba(255, 255, 255, 0.1)"}
+                          borderRadius="xl"
+                          backdropFilter="blur(10px)"
+                          _hover={{
+                            bg: selectedAmount === amount ? "rgba(0, 212, 255, 0.4)" : "rgba(255, 255, 255, 0.1)",
+                            borderColor: selectedAmount === amount ? "rgba(0, 212, 255, 1)" : "rgba(255, 255, 255, 0.2)",
+                            transform: "translateY(-2px)",
+                            boxShadow: "0 10px 25px rgba(0, 0, 0, 0.3)",
+                          }}
+                          transition="all 0.3s"
+                          fontWeight="bold"
+                          fontSize="lg"
                         >
                           ${amount}
                         </Button>
                       ))}
                     </HStack>
 
-                    <Text fontSize="md">Or enter custom amount:</Text>
+                    <Box textAlign="center">
+                      <Text fontSize="md" color="rgba(255, 255, 255, 0.7)" mb={3}>
+                        Or enter custom amount:
+                      </Text>
+                      <NumberInput
+                        min={1}
+                        value={customAmount}
+                        onChange={handleCustomAmountChange}
+                        size="lg"
+                      >
+                        <NumberInputField
+                          placeholder="Enter amount"
+                          textAlign="center"
+                          fontSize="lg"
+                          bg="rgba(255, 255, 255, 0.05)"
+                          border="1px solid"
+                          borderColor="rgba(255, 255, 255, 0.1)"
+                          color="white"
+                          borderRadius="xl"
+                          h="60px"
+                          _placeholder={{ color: "rgba(255, 255, 255, 0.4)" }}
+                          _focus={{ 
+                            borderColor: "rgba(0, 212, 255, 0.8)",
+                            boxShadow: "0 0 20px rgba(0, 212, 255, 0.3)",
+                            bg: "rgba(255, 255, 255, 0.08)",
+                          }}
+                          _hover={{
+                            borderColor: "rgba(255, 255, 255, 0.2)",
+                            bg: "rgba(255, 255, 255, 0.08)",
+                          }}
+                          transition="all 0.3s"
+                        />
+                      </NumberInput>
+                    </Box>
 
-                    <NumberInput
-                      min={1}
-                      value={customAmount}
-                      onChange={handleCustomAmountChange}
-                    >
-                      <NumberInputField
-                        placeholder="Enter amount"
-                        textAlign="center"
-                        fontSize="lg"
-                      />
-                    </NumberInput>
-
-                    <Flex direction="column" gap="1">
+                    <Flex direction="column" gap={3} mt={4}>
                       <Button
-                        colorScheme="green"
+                        variant="ghost"
                         size="lg"
                         onClick={handleSubmit}
                         isDisabled={
                           (!selectedAmount && !customAmount) || isLoading
                         }
                         isLoading={isLoading}
+                        fontSize="lg"
+                        bg="linear-gradient(135deg, rgba(0, 212, 255, 0.3) 0%, rgba(255, 107, 53, 0.3) 100%)"
+                        color="white"
+                        border="1px solid"
+                        borderColor="rgba(0, 212, 255, 0.5)"
+                        borderRadius="xl"
+                        h="60px"
+                        backdropFilter="blur(10px)"
+                        _hover={{
+                          bg: "linear-gradient(135deg, rgba(0, 212, 255, 0.5) 0%, rgba(255, 107, 53, 0.5) 100%)",
+                          borderColor: "rgba(0, 212, 255, 0.8)",
+                          transform: "translateY(-3px)",
+                          boxShadow: "0 15px 35px rgba(0, 212, 255, 0.4)",
+                        }}
+                        _active={{
+                          transform: "translateY(-1px)",
+                        }}
+                        transition="all 0.3s"
+                        fontWeight="bold"
+                        textShadow="0 1px 2px rgba(0, 0, 0, 0.5)"
                       >
-                        Donate ${selectedAmount || customAmount || "0"}
+                        🎨 Donate ${selectedAmount || customAmount || "0"}
                       </Button>
-                      <Box mx="auto" fontSize="sm" fontWeight="bold">
-                        (≈
-                        {paymentMethod === "stx"
+                      
+                      <Box 
+                        textAlign="center" 
+                        fontSize="sm" 
+                        fontWeight="bold" 
+                        color="rgba(255, 255, 255, 0.6)"
+                        p={3}
+                        bg="rgba(0, 0, 0, 0.2)"
+                        borderRadius="lg"
+                        border="1px solid"
+                        borderColor="rgba(255, 255, 255, 0.1)"
+                      >
+                        ≈ {paymentMethod === "stx"
                           ? `${usdToStx(
                               Number(selectedAmount || customAmount || "0"),
                               prices?.stx || 0
@@ -306,7 +545,6 @@ export default function DonationModal({
                               Number(selectedAmount || customAmount || "0"),
                               prices?.sbtc || 0
                             ).toFixed(8)} sBTC`}
-                        )
                       </Box>
                     </Flex>
                   </VStack>
@@ -315,8 +553,34 @@ export default function DonationModal({
             )}
           </Flex>
         </ModalBody>
-        <ModalFooter>
-          <Button onClick={onClose}>Close</Button>
+        
+        <ModalFooter 
+          bg="rgba(26, 32, 44, 0.9)"
+          borderTop="1px solid"
+          borderColor="rgba(0, 212, 255, 0.3)"
+          backdropFilter="blur(10px)"
+          position="relative"
+          zIndex={2}
+          py={4}
+        >
+          <Button 
+            onClick={onClose} 
+            variant="ghost"
+            border="1px solid"
+            borderColor="rgba(255, 255, 255, 0.2)"
+            color="rgba(255, 255, 255, 0.8)"
+            bg="rgba(255, 255, 255, 0.05)"
+            borderRadius="xl"
+            backdropFilter="blur(10px)"
+            _hover={{ 
+              bg: "rgba(255, 255, 255, 0.1)",
+              borderColor: "rgba(255, 255, 255, 0.4)",
+              color: "white",
+            }}
+            transition="all 0.3s"
+          >
+            Close
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

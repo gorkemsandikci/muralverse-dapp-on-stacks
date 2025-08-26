@@ -1,23 +1,28 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { JetBrains_Mono, Fira_Code, Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/ui/Providers";
 import { Navbar } from "@/components/Navbar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const firaCode = Fira_Code({
+  variable: "--font-fira-code",
+  subsets: ["latin"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Fundraising Campaign",
+  title: "Muralverse: Urban Canvas Community Street Art Revival",
   description:
-    "A crypto fundraising campaign accepting donations in STX & sBTC.",
+    "A blockchain-powered fundraising campaign for community street art murals, accepting donations in STX & sBTC.",
 };
 
 export default function RootLayout({
@@ -27,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${jetbrainsMono.variable} ${firaCode.variable} ${inter.variable}`}>
         <Providers>
           <>
             <Navbar />

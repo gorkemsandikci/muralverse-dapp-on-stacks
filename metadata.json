@@ -1,19 +1,28 @@
 {
-  "title": "Fundraising App",
-  "description": "A simple crowdfunding app, featuring a single page to display a campaign, and functionality to handle contributions, refunds, and withdrawal by the fundraiser.",
+  "title": "Muralverse: Urban Canvas Community Street Art Revival",
+  "description": "A blockchain-powered fundraising platform for community street art murals, featuring glassmorphism design, artist voting systems, and community engagement tools. Accepts contributions in STX & sBTC to transform urban spaces through collaborative art.",
   "type": "dapp",
-  "framework": "Clarity, Next.js, React.js",
-  "demoUrl": "https://demo.fundraising-dapp.platform.hiro.so",
-  "useCase": "Crowdfunding",
-  "complexity": "Intermediate",
+  "framework": "Clarity, Next.js, React.js, Chakra UI",
+  "demoUrl": "https://demo.muralverse.platform.hiro.so",
+  "useCase": "Community Art Fundraising",
+  "complexity": "Advanced",
   "tags": [
     "fundraising",
-    "crowdfunding",
+    "street-art",
+    "community-art",
+    "mural-project",
+    "glassmorphism",
     "sbtc",
     "web3",
     "smart-contract",
     "stacks",
     "clarity",
-    "next.js"
+    "next.js",
+    "chakra-ui",
+    "urban-beautification",
+    "artist-voting",
+    "community-engagement",
+    "blockchain-art",
+    "muralverse"
   ]
 }
