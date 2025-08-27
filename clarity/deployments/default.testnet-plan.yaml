@@ -34,8 +34,8 @@ plan:
             clarity-version: 3
         - contract-publish:
             contract-name: fundraising
-            expected-sender: ST21GQKKQEC09T4YY6AJJYG3EPPNKZZK83QVH4PDV
-            cost: 201651
+            expected-sender: STYTNC3WX902XR3F3MFW1N46MBMGY5GKTZD980FK
+            cost: 48555701
             path: contracts/fundraising.clar
             anchor-block-only: true
             clarity-version: 3
