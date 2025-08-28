@@ -24,7 +24,7 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon, InfoIcon } from "@chakra-ui/icons";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { CAMPAIGN_SUBTITLE, CAMPAIGN_TITLE, CAMPAIGN_GOAL_USD, CAMPAIGN_MILESTONES, FUNDING_BREAKDOWN } from "@/constants/campaign";
 
 import { useCampaignInfo, useExistingDonation } from "@/hooks/campaignQueries";
@@ -72,22 +72,22 @@ export default function CampaignDetails({
   const campaignIsCancelled =
     !campaignIsUninitialized && campaignInfo?.isCancelled;
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     setCurrentIndex((prevIndex) =>
       prevIndex === images.length - 1 ? 0 : prevIndex + 1
     );
-  };
+  }, [images.length]);
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? images.length - 1 : prevIndex - 1
     );
-  };
+  }, [images.length]);
 
   useEffect(() => {
     const timer = setInterval(nextSlide, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [nextSlide]);
 
   const progress = campaignInfo
     ? (campaignInfo.usdValue / campaignInfo.goal) * 100
@@ -599,10 +599,16 @@ export default function CampaignDetails({
                     <Box>
                       <AlertTitle color="white">Campaign Data Unavailable</AlertTitle>
                       <AlertDescription color="dark.400">
-                        Unable to retrieve campaign data from the blockchain.
-                        This could be due to network issues or the campaign may
-                        no longer exist.
+                        {campaignFetchError.message === "Contract address not configured. Please check environment variables." 
+                          ? "Smart contract not deployed or configured. Please ensure the contract is deployed on testnet and environment variables are set correctly."
+                          : campaignFetchError.message === "Error fetching campaign info from blockchain"
+                          ? "Unable to retrieve campaign data from the blockchain. This could be due to network issues, the campaign may no longer exist, or the contract may not be deployed."
+                          : `Error: ${campaignFetchError.message}`}
                       </AlertDescription>
+                      <Box mt={3} fontSize="sm" color="dark.300">
+                        <Text>Current network: {process.env.NEXT_PUBLIC_STACKS_NETWORK || 'devnet'}</Text>
+                        <Text>Contract address: {FUNDRAISING_CONTRACT.address || 'Not configured'}</Text>
+                      </Box>
                     </Box>
                   </Alert>
                 </Box>

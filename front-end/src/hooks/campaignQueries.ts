@@ -25,53 +25,71 @@ export const useCampaignInfo = (
   return useQuery<CampaignInfo>({
     queryKey: ["campaignInfo"],
     queryFn: async () => {
-      const response = await api.callReadOnlyFunction({
-        contractAddress: FUNDRAISING_CONTRACT.address || "",
-        contractName: FUNDRAISING_CONTRACT.name,
-        functionName: "get-campaign-info",
-        readOnlyFunctionArgs: {
-          sender: FUNDRAISING_CONTRACT.address || "",
-          arguments: [],
-        },
-      });
-      if (response?.okay && response?.result) {
-        const result = cvToJSON(hexToCV(response?.result || ""));
-        if (result?.success) {
-          const totalSbtc = parseInt(
-            result?.value?.value?.totalSbtc?.value,
-            10
-          );
-          const totalStx = parseInt(result?.value?.value?.totalStx?.value, 10);
-
-          return {
-            goal: parseInt(result?.value?.value?.goal?.value, 10),
-            start: parseInt(result?.value?.value?.start?.value, 10),
-            end: parseInt(result?.value?.value?.end?.value, 10),
-            totalSbtc,
-            totalStx,
-            usdValue:
-              Number(ustxToStx(totalStx)) * (currentPrices?.stx || 0) +
-              satsToSbtc(totalSbtc) * (currentPrices?.sbtc || 0),
-            donationCount: parseInt(
-              result?.value?.value?.donationCount?.value,
-              10
-            ),
-            isExpired: result?.value?.value?.isExpired?.value,
-            isWithdrawn: result?.value?.value?.isWithdrawn?.value,
-            isCancelled: result?.value?.value?.isCancelled?.value,
-          };
-        } else {
-          throw new Error("Error fetching campaign info from blockchain");
+      try {
+        console.log("Fetching campaign info from contract:", FUNDRAISING_CONTRACT.address);
+        console.log("Using API URL:", getStacksUrl());
+        
+        if (!FUNDRAISING_CONTRACT.address) {
+          throw new Error("Contract address not configured. Please check environment variables.");
         }
-      } else {
-        throw new Error(
-          response?.cause || "Error fetching campaign info from blockchain"
-        );
+
+        const response = await api.callReadOnlyFunction({
+          contractAddress: FUNDRAISING_CONTRACT.address,
+          contractName: FUNDRAISING_CONTRACT.name,
+          functionName: "get-campaign-info",
+          readOnlyFunctionArgs: {
+            sender: FUNDRAISING_CONTRACT.address,
+            arguments: [],
+          },
+        });
+
+        console.log("API Response:", response);
+
+        if (response?.okay && response?.result) {
+          const result = cvToJSON(hexToCV(response?.result || ""));
+          console.log("Parsed result:", result);
+          
+          if (result?.success) {
+            const totalSbtc = parseInt(
+              result?.value?.value?.totalSbtc?.value,
+              10
+            );
+            const totalStx = parseInt(result?.value?.value?.totalStx?.value, 10);
+
+            return {
+              goal: parseInt(result?.value?.value?.goal?.value, 10),
+              start: parseInt(result?.value?.value?.start?.value, 10),
+              end: parseInt(result?.value?.value?.end?.value, 10),
+              totalSbtc,
+              totalStx,
+              usdValue:
+                Number(ustxToStx(totalStx)) * (currentPrices?.stx || 0) +
+                satsToSbtc(totalSbtc) * (currentPrices?.sbtc || 0),
+              donationCount: parseInt(
+                result?.value?.value?.donationCount?.value,
+                10
+              ),
+              isExpired: result?.value?.value?.isExpired?.value,
+              isWithdrawn: result?.value?.value?.isWithdrawn?.value,
+              isCancelled: result?.value?.value?.isCancelled?.value,
+            };
+          } else {
+            throw new Error("Error fetching campaign info from blockchain");
+          }
+        } else {
+          throw new Error(
+            response?.cause || "Error fetching campaign info from blockchain"
+          );
+        }
+      } catch (error) {
+        console.error("Campaign info fetch error:", error);
+        throw error;
       }
     },
     refetchInterval: 10000,
-    retry: false,
-    enabled: !!(currentPrices?.stx && currentPrices?.sbtc),
+    retry: 3,
+    retryDelay: 1000,
+    enabled: !!(currentPrices?.stx && currentPrices?.sbtc && FUNDRAISING_CONTRACT.address),
   });
 };
 

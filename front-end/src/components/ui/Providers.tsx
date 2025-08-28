@@ -11,9 +11,8 @@ const queryClient = new QueryClient();
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+      <ColorModeScript initialColorMode="light" />
       <ChakraProvider theme={theme}>
-        <ColorModeScript initialColorMode="light" />
         <HiroWalletProvider>
           <DevnetWalletProvider>{children}</DevnetWalletProvider>
         </HiroWalletProvider>

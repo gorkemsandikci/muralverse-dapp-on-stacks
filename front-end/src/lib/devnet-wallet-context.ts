@@ -14,7 +14,7 @@ export interface DevnetWalletContextType {
 
 export const devnetWallets: DevnetWallet[] = [
   { 
-    stxAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM', 
+    stxAddress: 'STC9JV90Q6FVYTBWSH4NEKM1AEZDV0TGXE81HMAV', 
     label: 'Deployer',
     mnemonic: 'twice kind fence tip hidden tilt action fragile skin nothing glory cousin green tomorrow spring wrist shed math olympic multiply hip blue scout claw'
   },
