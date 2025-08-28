@@ -1,4 +1,4 @@
-;; Fundraising Campaign Contract
+;; Fundraising Campaign Contract V2
 ;; A simple contract to accept crypto donations in STX or sBTC.
 
 ;; Constants 
@@ -105,15 +105,15 @@
     (as-contract
       (begin
         (if (> total-stx-amount u0)
-          (try! (stx-transfer? total-stx-amount (as-contract tx-sender) tx-sender))
-          (ok true))
+          (try! (stx-transfer? total-stx-amount (as-contract tx-sender) (var-get beneficiary)))
+          true)
         (if (> total-sbtc-amount u0)
           (try! (contract-call? 'SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token transfer
-            total-sbtc-amount 
-            (as-contract tx-sender) 
-            tx-sender 
+            total-sbtc-amount
+            (as-contract tx-sender)
+            (var-get beneficiary)
             none))
-          (ok true))
+          true)
         (var-set is-campaign-withdrawn true)
         (ok true)))))
 

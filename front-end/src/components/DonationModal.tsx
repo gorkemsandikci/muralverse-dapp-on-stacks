@@ -51,7 +51,7 @@ export default function DonationModal({
   onClose,
 }: {
   isOpen: boolean;
-  onClose: () => undefined;
+  onClose: () => void;
 }) {
   const { mainnetAddress, testnetAddress } = useContext(HiroWalletContext);
   const {
