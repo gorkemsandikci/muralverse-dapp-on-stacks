@@ -10,8 +10,27 @@ export const Navbar = () => {
   const { currentWallet, wallets, setCurrentWallet } = useDevnetWallet();
 
   return (
-    <Box as="nav" bg="white" boxShadow="sm">
-      <Container maxW="container.xl">
+    <Box 
+      as="nav" 
+      bg="white" 
+      boxShadow="sm"
+      position="relative"
+      overflow="hidden"
+      _before={{
+        content: '""',
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundImage: "url('/images/hero-overlay-pattern.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        opacity: 0.65,
+        zIndex: 0,
+      }}
+    >
+      <Container maxW="container.xl" position="relative" zIndex={1}>
         <Flex justify="space-between" h={16} align="center">
           <Flex align="center">
             <Flex
@@ -28,11 +47,13 @@ export const Navbar = () => {
               align="center"
               color="gray.900"
               shrink="0"
+              position="relative"
+              zIndex={1}
             >
               /-/
             </Flex>
             <Link href="/" textDecoration="none">
-              <Box fontSize="lg" fontWeight="bold" color="gray.900" ml={4}>
+              <Box fontSize="lg" fontWeight="bold" color="gray.900" ml={4} position="relative" zIndex={1}>
                 Muralverse
               </Box>
             </Link>

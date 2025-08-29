@@ -165,6 +165,21 @@ export default function CampaignDetails({
           transition="all 0.5s ease-in-out"
         />
         
+        {/* Background Pattern Overlay */}
+        <Box
+          position="absolute"
+          top="0"
+          left="0"
+          right="0"
+          bottom="0"
+          backgroundImage="url('/images/hero-overlay-pattern.jpg')"
+          backgroundSize="cover"
+          backgroundPosition="center"
+          backgroundRepeat="no-repeat"
+          opacity="0.12"
+          zIndex="1"
+        />
+        
         {/* Gradient Overlay */}
         <Box
           position="absolute"
@@ -173,13 +188,13 @@ export default function CampaignDetails({
           right="0"
           bottom="0"
           bg="linear-gradient(135deg, rgba(26, 32, 44, 0.8) 0%, rgba(0, 212, 255, 0.2) 100%)"
-          zIndex="1"
+          zIndex="2"
         />
         
         {/* Content Overlay */}
         <Flex
           position="relative"
-          zIndex="2"
+          zIndex="3"
           direction="column"
           justify="center"
           align="center"
@@ -188,12 +203,10 @@ export default function CampaignDetails({
           px="8"
         >
           <Heading
+            size="h1"
+            variant="streetArt"
             fontSize={{ base: "4xl", md: "6xl", lg: "7xl" }}
-            fontWeight="900"
-            color="white"
-            textShadow="2px 2px 4px rgba(0,0,0,0.8)"
             mb="6"
-            fontFamily="Permanent Marker, cursive"
           >
             {CAMPAIGN_TITLE}
           </Heading>
@@ -324,14 +337,29 @@ export default function CampaignDetails({
                 p="6"
                 textAlign="center"
                 backdropFilter="blur(10px)"
+                position="relative"
+                overflow="hidden"
                 _hover={{ transform: "translateY(-5px)", transition: "all 0.3s" }}
+                _before={{
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundImage: "url('/images/hero-overlay-pattern.jpg')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  opacity: 0.08,
+                  zIndex: 0,
+                }}
               >
-                <Icon as={StarIcon} w="12" h="12" color="blue.400" mb="4" />
-                <Stat>
+                <Icon as={StarIcon} w="12" h="12" color="blue.400" mb="4" position="relative" zIndex={1} />
+                <Stat position="relative" zIndex={1}>
                   <StatNumber fontSize="3xl" color="blue.400" fontWeight="bold">
                     ${campaignInfo.usdValue.toLocaleString()}
                   </StatNumber>
-                  <StatLabel color="gray.600" fontSize="lg">Raised</StatLabel>
+                  <StatLabel color="white" fontSize="lg">Raised</StatLabel>
                 </Stat>
               </Box>
             </GridItem>
@@ -352,7 +380,7 @@ export default function CampaignDetails({
                   <StatNumber fontSize="3xl" color="orange.400" fontWeight="bold">
                     {campaignInfo.donationCount}
                   </StatNumber>
-                  <StatLabel color="gray.600" fontSize="lg">Supporters</StatLabel>
+                  <StatLabel color="white" fontSize="lg">Supporters</StatLabel>
                 </Stat>
               </Box>
             </GridItem>
@@ -373,7 +401,7 @@ export default function CampaignDetails({
                   <StatNumber fontSize="3xl" color="green.400" fontWeight="bold">
                     {blocksLeft}
                   </StatNumber>
-                  <StatLabel color="gray.600" fontSize="lg">Blocks Left</StatLabel>
+                  <StatLabel color="white" fontSize="lg">Blocks Left</StatLabel>
                 </Stat>
               </Box>
             </GridItem>
@@ -384,11 +412,10 @@ export default function CampaignDetails({
       {/* Visual Gallery Section */}
       <Box mb="8">
         <Heading
-          fontSize="3xl"
+          size="h2"
+          variant="streetArt"
           textAlign="center"
           mb="6"
-          color="gray.800"
-          fontFamily="Permanent Marker, cursive"
         >
           🎨 Art Gallery
         </Heading>
@@ -409,11 +436,31 @@ export default function CampaignDetails({
                   objectFit="cover"
                 />
               </AspectRatio>
-              <Box p="4" bg="white">
-                <Text fontWeight="bold" fontSize="lg" mb="2">
+              <Box 
+                p="4" 
+                bg="rgba(26, 32, 44, 0.95)" 
+                borderTop="1px solid" 
+                borderColor="rgba(255, 255, 255, 0.1)"
+                position="relative"
+                overflow="hidden"
+                _before={{
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundImage: "url('/images/hero-overlay-pattern.jpg')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  opacity: 0.06,
+                  zIndex: 0,
+                }}
+              >
+                <Text fontWeight="bold" fontSize="lg" mb="2" color="white" position="relative" zIndex={1}>
                   {item.title}
                 </Text>
-                <Text color="gray.600" fontSize="sm">
+                <Text color="rgba(255, 255, 255, 0.8)" fontSize="sm" position="relative" zIndex={1}>
                   {item.description}
                 </Text>
               </Box>
@@ -437,14 +484,14 @@ export default function CampaignDetails({
               <AlertTitle color="orange.600" fontSize="lg">
                 ⚠️ Campaign Data Unavailable
               </AlertTitle>
-              <AlertDescription color="gray.600">
+              <AlertDescription color="white">
                 {campaignFetchError.message === "Contract address not configured. Please check environment variables." 
                   ? "Smart contract not deployed or configured. Please ensure the contract is deployed on testnet and environment variables are set correctly."
                   : campaignFetchError.message === "Error fetching campaign info from blockchain"
                   ? "Unable to retrieve campaign data from the blockchain. This could be due to network issues, the campaign may no longer exist, or the contract may not be deployed."
                   : `Error: ${campaignFetchError.message}`}
               </AlertDescription>
-              <Box mt="3" fontSize="sm" color="gray.500">
+              <Box mt="3" fontSize="sm" color="rgba(255, 255, 255, 0.7)">
                 <Text>Network: {process.env.NEXT_PUBLIC_STACKS_NETWORK || 'devnet'}</Text>
                 <Text>Contract: {FUNDRAISING_CONTRACT.address || 'Not configured'}</Text>
               </Box>
@@ -457,21 +504,92 @@ export default function CampaignDetails({
       {!campaignFetchError && !campaignIsUninitialized && !campaignInfo && (
         <Box textAlign="center" py="20">
           <Spinner size="xl" color="blue.400" thickness="4px" />
-          <Text mt="4" color="gray.600" fontSize="lg">
+          <Text mt="4" color="white" fontSize="lg">
             Loading campaign data...
           </Text>
         </Box>
       )}
 
-      {/* Admin Controls - Visual */}
-      {campaignInfo && (
+      {/* Admin Controls - Visual - Only for Contract Owner */}
+      {campaignInfo && currentWalletAddress && 
+       currentWalletAddress === FUNDRAISING_CONTRACT.address ? (
         <CampaignAdminControls
           campaignIsUninitialized={campaignIsUninitialized || false}
           campaignIsCancelled={campaignIsCancelled || false}
           campaignIsExpired={campaignIsExpired || false}
           campaignIsWithdrawn={campaignInfo.isWithdrawn}
         />
-      )}
+      ) : campaignInfo && currentWalletAddress && 
+        currentWalletAddress !== FUNDRAISING_CONTRACT.address ? (
+        <Box 
+          mb="8" 
+          p="6" 
+          bg="rgba(0, 212, 255, 0.1)" 
+          border="2px solid" 
+          borderColor="rgba(0, 212, 255, 0.3)" 
+          borderRadius="2xl"
+          backdropFilter="blur(10px)"
+          textAlign="center"
+          position="relative"
+          overflow="hidden"
+          _before={{
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: "url('/images/hero-overlay-pattern.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: 0.05,
+            zIndex: 0,
+          }}
+        >
+          <Text color="white" fontSize="lg" fontWeight="bold" mb="2" position="relative" zIndex={1}>
+            🎨 Campaign Management
+          </Text>
+          <Text color="rgba(255, 255, 255, 0.8)" fontSize="md" position="relative" zIndex={1}>
+            This campaign is managed by the contract owner. Only the campaign creator can initialize, cancel, or withdraw funds.
+          </Text>
+          <Text color="rgba(255, 255, 255, 0.6)" fontSize="sm" mt="3" position="relative" zIndex={1}>
+            Contract Owner: {FUNDRAISING_CONTRACT.address}
+          </Text>
+        </Box>
+      ) : campaignInfo && !currentWalletAddress ? (
+        <Box 
+          mb="8" 
+          p="6" 
+          bg="rgba(255, 107, 53, 0.1)" 
+          border="2px solid" 
+          borderColor="rgba(255, 107, 53, 0.3)" 
+          borderRadius="2xl"
+          backdropFilter="blur(10px)"
+          textAlign="center"
+          position="relative"
+          overflow="hidden"
+          _before={{
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: "url('/images/hero-overlay-pattern.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: 0.05,
+            zIndex: 0,
+          }}
+        >
+          <Text color="white" fontSize="lg" fontWeight="bold" mb="2" position="relative" zIndex={1}>
+            🔐 Wallet Connection Required
+          </Text>
+          <Text color="rgba(255, 255, 255, 0.8)" fontSize="md" position="relative" zIndex={1}>
+            Connect your wallet to view campaign management options and make donations.
+          </Text>
+        </Box>
+      ) : null}
 
       {/* Donation Modal */}
       <DonationModal

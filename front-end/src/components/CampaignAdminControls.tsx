@@ -8,6 +8,7 @@ import {
   isDevnetEnvironment,
   isTestnetEnvironment,
 } from "@/lib/contract-utils";
+import { FUNDRAISING_CONTRACT } from "@/constants/contracts";
 import {
   Alert,
   AlertDescription,
@@ -49,6 +50,14 @@ export default function CampaignAdminControls({
     : isTestnetEnvironment()
     ? testnetAddress
     : mainnetAddress;
+
+  // Additional security check - ensure this component is only rendered for contract owner
+  const isContractOwner = currentWalletAddress === FUNDRAISING_CONTRACT.address;
+  
+  // If not contract owner, don't render anything
+  if (!isContractOwner) {
+    return null;
+  }
 
   const [isInitializingCampaign, setIsInitializingCampaign] = useState(false);
   const [isCancelConfirmationModalOpen, setIsCancelConfirmationModalOpen] =

@@ -1,7 +1,7 @@
 # Urban Canvas: Community Street Art Revival
 
 <div align="center">
-  <img src="./screenshotv1.png" alt="Street Art Mural Project" width="600" style="max-width: 60%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+  <img src="./screenshot.png" alt="Street Art Mural Project" width="600" style="max-width: 60%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 </div>
 
 A vibrant, community-driven fundraising platform built on Stacks blockchain for the **Urban Canvas: Community Street Art Revival** campaign. This project transforms the Hiro Platform fundraising template into an immersive street art experience that celebrates community creativity and urban transformation.
@@ -36,7 +36,7 @@ A vibrant, community-driven fundraising platform built on Stacks blockchain for 
 1. **Clone the Repository**
 ```bash
 git clone https://github.com/gorkemsandikci/muralverse-dapp-on-stacks
-cd fundraising-dapp-on-stacks
+cd muralverse-dapp-on-stacks
 ```
 
 2. **Install Dependencies**
@@ -62,6 +62,38 @@ npm run dev
 ```
 
 Visit `http://localhost:3000` to view your street art fundraising platform.
+
+## 🔗 Contract & Network Information
+
+### Smart Contract Details
+- **Contract Name**: `fundraising-v2`
+- **Language**: Clarity
+- **Network**: Testnet (ready for mainnet)
+- **Contract Owner**: Campaign creator (deployer)
+
+### Network Configuration
+```bash
+# Testnet
+NEXT_PUBLIC_STACKS_NETWORK=testnet
+NEXT_PUBLIC_CONTRACT_DEPLOYER_TESTNET_ADDRESS=STC9JV90Q6FVYTBWSH4NNZX32CTSG82JFQ4
+
+# Mainnet (when deployed)
+NEXT_PUBLIC_STACKS_NETWORK=mainnet
+NEXT_PUBLIC_CONTRACT_DEPLOYER_MAINNET_ADDRESS=your-mainnet-address
+```
+
+### Devnet Wallets (for testing)
+```bash
+# Deployer Wallet (Admin)
+STC9JV90Q6FVYTBWSH4NNZX32CTSG82JFQ4
+
+# Test Wallets
+ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5
+ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG
+ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC
+ST2NEB84ASENDXKYGJPQW86YXQCEFEX2ZQPG87ND
+ST2REHHS5J3CERCRBEPMGH7921Q6PYKAADT7JP2VB
+```
 
 ## 🎨 Customization Guide
 
@@ -102,37 +134,75 @@ Modify `front-end/src/theme.ts` for:
 
 ### `fundraising.clar`
 The core Clarity smart contract that handles:
-- Campaign initialization with USD funding goals
-- STX and sBTC donation acceptance
-- Individual contribution tracking
-- Fund withdrawal for beneficiaries
-- Campaign cancellation and refunds
+- **Campaign Management**: Initialization, cancellation, and withdrawal
+- **Donation Processing**: STX and sBTC acceptance with individual tracking
+- **Security Controls**: Admin-only functions with proper authorization
+- **Fund Management**: Transparent allocation and beneficiary withdrawal
+- **Refund System**: Campaign cancellation with donor refunds
 
 ### Key Functions
-- `initialize-campaign`: Set up fundraising parameters
-- `contribute-stx`: Accept STX donations
-- `contribute-sbtc`: Accept sBTC donations
-- `withdraw-funds`: Beneficiary fund withdrawal
-- `cancel-campaign`: Cancel and refund donations
+```clarity
+;; Admin Functions (Contract Owner Only)
+(define-public (initialize-campaign (goal uint) (duration uint))
+(define-public (cancel-campaign)
+(define-public (withdraw)
 
-## 🧪 Testing with Devnet
+;; Public Functions
+(define-public (donate-stx (amount uint))
+(define-public (donate-sbtc (amount uint))
+(define-public (refund)
 
-### 1. Start Hiro Platform Devnet
-1. Log into [Hiro Platform](https://platform.hiro.so)
-2. Navigate to your project and start Devnet
-3. Copy your API key from the Devnet Stacks API URL
+;; Read-Only Functions
+(define-read-only (get-campaign-info)
+(define-read-only (get-stx-donation (donor principal))
+(define-read-only (get-sbtc-donation (donor principal))
+```
 
-### 2. Test Smart Contract Functions
-1. Select the Devnet tab in Platform dashboard
-2. Click "Interact with Devnet" → "Call functions"
-3. Test campaign initialization, donations, and withdrawals
-4. Use pre-funded devnet wallets for testing
+### Security Features
+- **Owner Verification**: Only contract deployer can manage campaign
+- **Single Initialization**: Campaign can only be started once
+- **Proper Authorization**: All admin functions require owner verification
+- **Safe Withdrawals**: Funds only accessible to beneficiary after campaign ends
 
-### 3. Frontend Integration Testing
-1. Ensure Devnet is running
-2. Start frontend with `npm run dev`
-3. Test donation flow, voting system, and UI interactions
-4. Verify blockchain transactions in Devnet dashboard
+## 🧪 Testing & Development
+
+### Devnet Testing
+1. **Start Hiro Platform Devnet**
+   - Log into [Hiro Platform](https://platform.hiro.so)
+   - Navigate to your project and start Devnet
+   - Copy your API key from the Devnet Stacks API URL
+
+2. **Test Smart Contract Functions**
+   - Select the Devnet tab in Platform dashboard
+   - Click "Interact with Devnet" → "Call functions"
+   - Test campaign initialization, donations, and withdrawals
+   - Use pre-funded devnet wallets for testing
+
+3. **Frontend Integration Testing**
+   - Ensure Devnet is running
+   - Start frontend with `npm run dev`
+   - Test donation flow, voting system, and UI interactions
+   - Verify blockchain transactions in Devnet dashboard
+
+### Test Wallets & Balances
+```bash
+# Deployer Wallet (Admin)
+Address: STC9JV90Q6FVYTBWSH4NNZX32CTSG82JFQ4
+Balance: 100,000 STX + 1,000 sBTC (devnet)
+
+# Test Donor Wallets
+ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5
+ST2CY5V39NHDPWSXMW9QDT3HC3GD6Q6XX4CFRK9AG
+ST2JHG361ZXG51QTKY2NQCVBPPRRE2KZB1HR05NNC
+```
+
+### Testing Scenarios
+- ✅ **Campaign Initialization**: Admin sets goal and duration
+- ✅ **STX Donations**: Users contribute STX tokens
+- ✅ **sBTC Donations**: Users contribute Bitcoin on Stacks
+- ✅ **Admin Controls**: Owner can cancel and withdraw
+- ✅ **Refund System**: Donors get refunds if campaign cancelled
+- ✅ **Security**: Non-admin users cannot access admin functions
 
 ## 🌈 Street Art Theme Features
 
@@ -177,17 +247,27 @@ The core Clarity smart contract that handles:
 ## 🚀 Deployment
 
 ### Testnet Deployment
-1. Get test STX from [Stacks Testnet Faucet](https://explorer.hiro.so/sandbox/faucet?chain=testnet)
-2. Update environment variables for testnet
-3. Deploy contracts through Hiro Platform
-4. Test with real network conditions
+1. **Get Test STX**: Visit [Stacks Testnet Faucet](https://explorer.hiro.so/sandbox/faucet?chain=testnet)
+2. **Update Environment**: Set `NEXT_PUBLIC_STACKS_NETWORK=testnet`
+3. **Deploy Contract**: Use Clarinet or Hiro Platform to deploy `fundraising.clar`
+4. **Initialize Campaign**: Call `initialize-campaign` function with goal amount
+5. **Test Functions**: Verify donations, withdrawals, and admin controls
 
 ### Mainnet Launch
-1. Ensure sufficient STX for deployment costs
-2. Update deployment configuration for mainnet
-3. Deploy contracts through Platform dashboard
-4. Update frontend environment variables
-5. Launch and begin processing real transactions
+1. **Prepare STX**: Ensure sufficient STX for deployment costs (~50-100 STX)
+2. **Update Config**: Set `NEXT_PUBLIC_STACKS_NETWORK=mainnet`
+3. **Deploy Contracts**: Deploy through Hiro Platform or Clarinet
+4. **Update Frontend**: Set mainnet contract addresses
+5. **Launch**: Begin accepting real donations
+
+### Contract Deployment Commands
+```bash
+# Using Clarinet
+clarinet contract publish fundraising-v2
+
+# Using Hiro Platform
+# Upload fundraising.clar through Platform dashboard
+```
 
 ## 🔧 Technical Stack
 
@@ -209,6 +289,71 @@ The core Clarity smart contract that handles:
 - **Package Manager**: npm
 - **Code Quality**: ESLint, TypeScript compiler
 
+## ⚙️ Environment Configuration
+
+### Required Environment Variables
+```bash
+# Network Configuration
+NEXT_PUBLIC_STACKS_NETWORK=testnet|mainnet|devnet
+
+# Hiro Platform API Key
+NEXT_PUBLIC_PLATFORM_HIRO_API_KEY=your-api-key-here
+
+# Contract Deployer Addresses
+NEXT_PUBLIC_CONTRACT_DEPLOYER_TESTNET_ADDRESS=STC9JV90Q6FVYTBWSH4NNZX32CTSG82JFQ4
+NEXT_PUBLIC_CONTRACT_DEPLOYER_MAINNET_ADDRESS=your-mainnet-address
+
+# Devnet Configuration
+NEXT_PUBLIC_DEVNET_HOST=platform
+```
+
+### Environment Setup by Network
+```bash
+# For Testnet Development
+NEXT_PUBLIC_STACKS_NETWORK=testnet
+NEXT_PUBLIC_CONTRACT_DEPLOYER_TESTNET_ADDRESS=STC9JV90Q6FVYTBWSH4NNZX32CTSG82JFQ4
+
+# For Mainnet Production
+NEXT_PUBLIC_STACKS_NETWORK=mainnet
+NEXT_PUBLIC_CONTRACT_DEPLOYER_MAINNET_ADDRESS=your-deployed-contract-address
+
+# For Local Devnet Testing
+NEXT_PUBLIC_STACKS_NETWORK=devnet
+NEXT_PUBLIC_PLATFORM_HIRO_API_KEY=your-devnet-api-key
+```
+
+## 🏗️ Project Structure
+
+```
+muralverse-dapp-on-stacks/
+├── clarity/                          # Smart Contracts
+│   ├── contracts/
+│   │   └── fundraising.clar         # Main fundraising contract
+│   ├── tests/
+│   │   └── fundraising.test.ts      # Contract tests
+│   └── deployments/                 # Deployment configurations
+│       └── default.testnet-plan.yaml
+├── front-end/                       # Next.js Frontend
+│   ├── src/
+│   │   ├── components/              # React Components
+│   │   │   ├── CampaignDetails.tsx  # Main campaign page
+│   │   │   ├── DonationModal.tsx    # Donation interface
+│   │   │   ├── CampaignAdminControls.tsx # Admin controls
+│   │   │   ├── Navbar.tsx          # Navigation
+│   │   │   └── StyledMarkdown.tsx  # Markdown renderer
+│   │   ├── constants/               # Configuration
+│   │   │   ├── campaign.ts         # Campaign settings
+│   │   │   └── contracts.ts        # Contract addresses
+│   │   ├── hooks/                   # Custom React hooks
+│   │   ├── lib/                     # Utility functions
+│   │   └── theme.ts                 # Chakra UI theme
+│   ├── public/                      # Static assets
+│   │   ├── images/                  # Campaign images
+│   │   └── campaign-details.md      # Campaign content
+│   └── package.json                 # Dependencies
+└── README.md                         # This file
+```
+
 ## 🤝 Contributing
 
 ### Development Workflow
@@ -223,6 +368,7 @@ The core Clarity smart contract that handles:
 - Maintain street art aesthetic consistency
 - Ensure mobile responsiveness
 - Include accessibility features
+- Use English for all code and comments
 
 ## 📋 Project Roadmap
 
@@ -281,13 +427,27 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **Hiro Systems** for the fundraising template
-- **Stacks Foundation** for blockchain infrastructure
-- **Downtown Arts Collective** for project inspiration
-- **Community artists** for creative vision
+- **Hiro Systems** for the fundraising template and platform
+- **Stacks Foundation** for blockchain infrastructure and Clarity language
+- **Downtown Arts Collective** for project inspiration and community vision
+- **Community artists** for creative vision and urban transformation
+- **Stacks Community** for support and feedback
+
+## 📞 Support & Contact
+
+- **GitHub Issues**: [Report bugs or request features](https://github.com/gorkemsandikci/muralverse-dapp-on-stacks/issues)
+- **Documentation**: [Stacks Documentation](https://docs.stacks.co/)
+- **Community**: [Stacks Discord](https://discord.gg/stacks)
 
 ---
 
 **Urban Canvas: Community Street Art Revival** - Transforming spaces, building community, one mural at a time. 🎨✨
 
 *Built with ❤️ on Stacks blockchain*
+
+---
+
+<div align="center">
+  <sub>Made with ❤️ by the Muralverse team</sub><br>
+  <sub>Powered by <a href="https://www.stacks.co/">Stacks</a> and <a href="https://www.hiro.so/">Hiro</a></sub>
+</div>

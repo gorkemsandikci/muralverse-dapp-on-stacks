@@ -15,6 +15,7 @@ interface CampaignInfo {
   isExpired: boolean;
   isWithdrawn: boolean;
   isCancelled: boolean;
+  isInitialized: boolean;
 }
 
 export const useCampaignInfo = (
@@ -72,6 +73,7 @@ export const useCampaignInfo = (
               isExpired: result?.value?.value?.isExpired?.value,
               isWithdrawn: result?.value?.value?.isWithdrawn?.value,
               isCancelled: result?.value?.value?.isCancelled?.value,
+              isInitialized: result?.value?.value?.start?.value > 0, // Campaign is initialized if start > 0
             };
           } else {
             throw new Error("Error fetching campaign info from blockchain");

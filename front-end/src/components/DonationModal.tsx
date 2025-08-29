@@ -1,4 +1,4 @@
-import { useExistingDonation } from "@/hooks/campaignQueries";
+import { useExistingDonation, useCampaignInfo } from "@/hooks/campaignQueries";
 import {
   Alert,
   AlertDescription,
@@ -67,6 +67,7 @@ export default function DonationModal({
 
   const { data: previousDonation } = useExistingDonation(currentWalletAddress);
   const { data: prices } = useCurrentPrices();
+  const { data: campaignInfo } = useCampaignInfo(prices);
 
   const hasMadePreviousDonation =
     previousDonation &&
@@ -107,6 +108,18 @@ export default function DonationModal({
       return;
     }
 
+    if (!campaignInfo?.isInitialized) {
+      toast({
+        title: "Campaign Not Ready",
+        description: "This campaign has not been initialized yet. Please wait for the campaign owner to start the campaign.",
+        status: "error",
+        duration: 8000,
+        isClosable: true,
+      });
+      setIsLoading(false);
+      return;
+    }
+
     try {
       if (paymentMethod === "stx") {
         const stxAmount = usdToStx(amount, prices?.stx || 0);
@@ -115,7 +128,7 @@ export default function DonationModal({
         if (isDevnetEnvironment()) {
           const txOptions = getContributeStxTx(
             getStacksNetworkString(),
-            { address: currentWalletAddress || "", amount: Number(ustxAmount) }
+            { address: currentWalletAddress || "", amount: Math.floor(Number(ustxAmount)) }
           );
           await executeContractCall(
             txOptions,
@@ -124,7 +137,7 @@ export default function DonationModal({
         } else {
           const txOptions = getContributeStxTx(
             getStacksNetworkString(),
-            { address: currentWalletAddress || "", amount: Number(ustxAmount) }
+            { address: currentWalletAddress || "", amount: Math.floor(Number(ustxAmount)) }
           );
           await openContractCall(txOptions);
         }
@@ -135,7 +148,7 @@ export default function DonationModal({
                   if (isDevnetEnvironment()) {
             const txOptions = getContributeSbtcTx(
               getStacksNetworkString(),
-              { address: currentWalletAddress || "", amount: satsAmount }
+              { address: currentWalletAddress || "", amount: Math.floor(satsAmount) }
             );
             await executeContractCall(
               txOptions,
@@ -144,8 +157,8 @@ export default function DonationModal({
           } else {
           const txOptions = getContributeSbtcTx(
             getStacksNetworkString(),
-            { address: currentWalletAddress || "", amount: satsAmount }
-          );
+            { address: currentWalletAddress || "", amount: Math.floor(satsAmount) }
+            );
           await openContractCall(txOptions);
         }
       }
@@ -161,11 +174,27 @@ export default function DonationModal({
       onClose();
     } catch (error) {
       console.error("Contribution error:", error);
+      
+      // Provide more specific error messages
+      let errorMessage = "There was an error processing your contribution";
+      
+      if (error instanceof Error) {
+        if (error.message.includes('err u102')) {
+          errorMessage = "Campaign not initialized yet. Please wait for the campaign to be started.";
+        } else if (error.message.includes('broadcasting')) {
+          errorMessage = "Transaction failed to broadcast. Please check your wallet connection.";
+        } else if (error.message.includes('cancelled')) {
+          errorMessage = "Transaction was cancelled.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Contribution failed",
-        description: "There was an error processing your contribution",
+        description: errorMessage,
         status: "error",
-        duration: 5000,
+        duration: 8000,
         isClosable: true,
       });
     } finally {
@@ -195,7 +224,11 @@ export default function DonationModal({
           left: 0,
           right: 0,
           bottom: 0,
-          background: "linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(255, 107, 53, 0.1) 50%, rgba(57, 255, 20, 0.1) 100%)",
+          background: `linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(255, 107, 53, 0.1) 50%, rgba(57, 255, 20, 0.1) 100%), url('/images/hero-overlay-pattern.jpg')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          opacity: 0.15,
           borderRadius: "inherit",
           zIndex: 0,
         }}
@@ -225,7 +258,6 @@ export default function DonationModal({
         />
         
         <ModalHeader 
-          fontFamily="tech" 
           color="white" 
           textAlign="center" 
           bg="rgba(26, 32, 44, 0.9)"
@@ -296,7 +328,24 @@ export default function DonationModal({
               </VStack>
             ) : (
               <>
-                {hasMadePreviousDonation ? (
+                {!campaignInfo?.isInitialized ? (
+                  <Alert 
+                    bg="rgba(255, 107, 53, 0.1)"
+                    borderColor="rgba(255, 107, 53, 0.3)"
+                    border="1px solid"
+                    borderRadius="xl"
+                    backdropFilter="blur(10px)"
+                  >
+                    <Box>
+                      <AlertTitle color="white" fontSize="lg">
+                        ⚠️ Campaign Not Ready
+                      </AlertTitle>
+                      <AlertDescription color="rgba(255, 255, 255, 0.8)" mt={2}>
+                        This campaign has not been initialized yet. Please wait for the campaign owner to start the campaign before making donations.
+                      </AlertDescription>
+                    </Box>
+                  </Alert>
+                ) : hasMadePreviousDonation ? (
                   <Alert 
                     bg="rgba(0, 212, 255, 0.1)"
                     borderColor="rgba(0, 212, 255, 0.3)"
@@ -335,6 +384,19 @@ export default function DonationModal({
                   backdropFilter="blur(10px)"
                   position="relative"
                   overflow="hidden"
+                  _before={{
+                    content: '""',
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundImage: "url('/images/hero-overlay-pattern.jpg')",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    opacity: 0.08,
+                    zIndex: 0,
+                  }}
                 >
                   {/* Inner decorative elements */}
                   <Box
@@ -346,6 +408,7 @@ export default function DonationModal({
                     bg="rgba(57, 255, 20, 0.3)"
                     borderRadius="full"
                     filter="blur(5px)"
+                    zIndex={2}
                   />
                   <Box
                     position="absolute"
@@ -356,6 +419,7 @@ export default function DonationModal({
                     bg="rgba(255, 107, 53, 0.3)"
                     borderRadius="full"
                     filter="blur(3px)"
+                    zIndex={2}
                   />
                   
                   <VStack spacing={6} align="stretch" position="relative" zIndex={1}>
@@ -498,7 +562,7 @@ export default function DonationModal({
                         size="lg"
                         onClick={handleSubmit}
                         isDisabled={
-                          (!selectedAmount && !customAmount) || isLoading
+                          (!selectedAmount && !customAmount) || isLoading || !campaignInfo?.isInitialized
                         }
                         isLoading={isLoading}
                         fontSize="lg"
@@ -522,7 +586,10 @@ export default function DonationModal({
                         fontWeight="bold"
                         textShadow="0 1px 2px rgba(0, 0, 0, 0.5)"
                       >
-                        🎨 Donate ${selectedAmount || customAmount || "0"}
+                        {!campaignInfo?.isInitialized 
+                          ? "⏳ Campaign Not Ready" 
+                          : `🎨 Donate $${selectedAmount || customAmount || "0"}`
+                        }
                       </Button>
                       
                       <Box 

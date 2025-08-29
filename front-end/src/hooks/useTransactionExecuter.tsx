@@ -70,7 +70,8 @@ export default function useTransactionExecuter() {
             });
           }
         } catch (error) {
-          if (error instanceof Error && error.message?.includes('cancelled')) {
+          const message = (error as Error)?.message || '';
+          if (message.includes('cancelled') || message.includes('User rejected request')) {
             toast({
               title: "Transaction not submitted",
               description: "Transaction was cancelled",

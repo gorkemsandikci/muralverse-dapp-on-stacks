@@ -20,6 +20,9 @@ export const getContributeStxTx = (
 ): ContractCallRegularOptions => {
   const { address, amount } = params;
 
+  // Ensure amount is an integer for uintCV
+  const integerAmount = Math.floor(amount);
+
   return {
     anchorMode: AnchorMode.Any,
     postConditionMode: PostConditionMode.Deny,
@@ -27,8 +30,8 @@ export const getContributeStxTx = (
     contractName: FUNDRAISING_CONTRACT.name,
     network,
     functionName: "donate-stx",
-    functionArgs: [uintCV(amount)],
-    postConditions: [Pc.principal(address).willSendEq(amount).ustx()],
+    functionArgs: [uintCV(integerAmount)],
+    postConditions: [Pc.principal(address).willSendEq(integerAmount).ustx()],
   };
 };
 
@@ -38,12 +41,15 @@ export const getContributeSbtcTx = (
 ): ContractCallRegularOptions => {
   const { address, amount } = params;
 
+  // Ensure amount is an integer for uintCV
+  const integerAmount = Math.floor(amount);
+
   const postCondition: FungiblePostCondition = {
     type: "ft-postcondition",
     address,
     condition: "eq",
     asset: `${SBTC_CONTRACT.address}.${SBTC_CONTRACT.name}::sbtc-token`,
-    amount,
+    amount: integerAmount,
   };
 
   return {
@@ -53,7 +59,7 @@ export const getContributeSbtcTx = (
     contractName: FUNDRAISING_CONTRACT.name,
     network,
     functionName: "donate-sbtc",
-    functionArgs: [uintCV(amount)],
+    functionArgs: [uintCV(integerAmount)],
     postConditions: [postCondition],
   };
 };
@@ -63,6 +69,9 @@ export const getInitializeTx = (
   address: string,
   goalInUSD: number
 ): ContractCallRegularOptions => {
+  // Ensure goalInUSD is an integer for uintCV
+  const integerGoal = Math.floor(goalInUSD);
+
   return {
     anchorMode: AnchorMode.Any,
     postConditionMode: PostConditionMode.Deny,
@@ -70,7 +79,7 @@ export const getInitializeTx = (
     contractName: FUNDRAISING_CONTRACT.name,
     network,
     functionName: "initialize-campaign",
-    functionArgs: [uintCV(goalInUSD), uintCV(0)],
+    functionArgs: [uintCV(integerGoal), uintCV(0)],
     postConditions: [Pc.principal(address).willSendEq(0).ustx()],
   };
 };

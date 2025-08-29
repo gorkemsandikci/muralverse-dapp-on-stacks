@@ -53,6 +53,54 @@ const theme = extendTheme({
     "9xl": "8rem",
   },
   components: {
+    Heading: {
+      baseStyle: {
+        fontFamily: "heading",
+        fontWeight: "bold",
+        color: "white",
+        textShadow: "1px 1px 2px rgba(0,0,0,0.8)",
+      },
+      variants: {
+        streetArt: {
+          fontFamily: "'Permanent Marker', cursive",
+          fontWeight: "900",
+          textShadow: "2px 2px 4px rgba(0,0,0,0.8)",
+        },
+        graffiti: {
+          fontFamily: "'Permanent Marker', cursive",
+          fontWeight: "900",
+          textShadow: "2px 2px 4px rgba(0,0,0,0.8)",
+        },
+        tech: {
+          fontFamily: "tech",
+          fontWeight: "bold",
+          textShadow: "1px 1px 2px rgba(0,0,0,0.8)",
+        },
+        urban: {
+          fontFamily: "'Permanent Marker', cursive",
+          fontWeight: "800",
+          textShadow: "1px 1px 3px rgba(0,0,0,0.7)",
+        },
+      },
+      sizes: {
+        h1: {
+          fontSize: "4xl",
+          lineHeight: "1.2",
+        },
+        h2: {
+          fontSize: "3xl",
+          lineHeight: "1.3",
+        },
+        h3: {
+          fontSize: "2xl",
+          lineHeight: "1.4",
+        },
+        h4: {
+          fontSize: "xl",
+          lineHeight: "1.5",
+        },
+      },
+    },
     Button: {
       baseStyle: {
         fontWeight: "bold",
@@ -97,12 +145,20 @@ const theme = extendTheme({
         },
       },
     },
+    ModalHeader: {
+      baseStyle: {
+        fontFamily: "tech",
+        fontWeight: "bold",
+        color: "white",
+        textShadow: "1px 1px 2px rgba(0,0,0,0.8)",
+      },
+    },
   },
   styles: {
     global: {
       body: {
         bg: "dark.50",
-        color: "dark.800",
+        color: "white",
       },
     },
   },

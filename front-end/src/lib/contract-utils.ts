@@ -66,30 +66,27 @@ export const executeContractCall = async (
 
 export const openContractCall = async (options: ContractCallRegularOptions) => {
   try {
+    // For testnet/mainnet, we need to use the proper wallet connection
+    // This function should trigger the wallet to open and sign the transaction
     const contract = `${options.contractAddress}.${options.contractName}`;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const params: any = {
+    
+    // Use the proper request format for wallet connection
+    const result = await request({
+      appDetails: {
+        name: "Muralverse DApp",
+        icon: "https://example.com/icon.png",
+      },
+      onFinish: options.onFinish,
+      onCancel: options.onCancel,
+    }, 'stx_callContract', {
       contract,
       functionName: options.functionName,
       functionArgs: options.functionArgs,
-      network:
-        typeof options.network === 'object'
-          ? 'chainId' in options.network
-            ? options.network.chainId === 1
-              ? 'mainnet'
-              : 'testnet'
-            : options.network
-          : options.network,
+      network: options.network,
       postConditions: options.postConditions,
       postConditionMode: options.postConditionMode === PostConditionMode.Allow ? 'allow' : 'deny',
       sponsored: options.sponsored,
-    };
-
-    const result = await request({}, 'stx_callContract', params);
-
-    if (options.onFinish) {
-      options.onFinish({ txId: result.txid } as unknown as FinishedTxData);
-    }
+    });
 
     return result;
   } catch (error: unknown) {
